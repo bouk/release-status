@@ -8,21 +8,19 @@ type InstallCommandProps = {
 };
 
 export const InstallCommand = ({ name, prefix, version }: InstallCommandProps) => {
-  const installString = `${prefix} electron@${version.slice(1)}`;
+  const isNightly = version.includes('nightly');
+  const installString = `${prefix} electron@${isNightly ? 'npm:electron-nightly@' : ''}${version.slice(1)}`;
 
-  const [recentlyCopied, setDidRecentlyCopy] = useState(false);
-
+  const [recentlyCopied, setRecentlyCopied] = useState(false);
   const timerRef = useRef<NodeJS.Timeout>();
+
   const copyCommand = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-
       navigator.clipboard.writeText(installString);
-      setDidRecentlyCopy(true);
-      timerRef.current = setTimeout(() => {
-        setDidRecentlyCopy(false);
-      }, 3_000);
+      setRecentlyCopied(true);
+      timerRef.current = setTimeout(() => setRecentlyCopied(false), 3000);
     },
     [installString],
   );
